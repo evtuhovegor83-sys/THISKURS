@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Презентация курсового проекта: Веб-сервис «BiteGo» | Евтухов Е.А.</title>
+    <style>
+        :root {
+            --primary: #FF5A1F;
+            --primary-soft: #FFF1EB;
+            --primary-glow: rgba(255, 90, 31, 0.25);
+            --primary-dark: #D8420B;
+            --secondary: #10B981;
+            --secondary-soft: #ECFDF5;
+            --blue-accent: #2563EB;
+            --blue-soft: #EFF6FF;
+            --bg-light: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --card-border: #E2E8F0;
+            --card-border-hover: #CBD5E1;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --text-dim: #64748B;
+            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            font-family: var(--font-main);
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+
+        /* Subtle Light Gradient & Geometric Mesh */
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 10% 12%, rgba(255, 90, 31, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 88%, rgba(16, 185, 129, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, #FFFFFF 0%, #F8FAFC 100%);
+        }
+
+        /* Top Progress Line (3px) */
+        #progressBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #FF5A1F, #FF8C38, #10B981);
+            box-shadow: 0 0 10px var(--primary-glow);
+            z-index: 1000;
+            transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Deck Container */
+        .deck-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Standard Slide Layout */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.2rem 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.98) translateX(25px);
+            transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateX(0);
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: scale(0.98) translateX(-25px);
+        }
+
+        /* Slide Top Header (Clean Light Style) */
+        .slide-header-clean {
+            width: 100%;
+            max-width: 1320px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.65rem;
+        }
+
+        .slide-badge-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .slide-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.22rem 0.75rem;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            border: 1px solid rgba(255, 90, 31, 0.3);
+            color: var(--primary-dark);
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .slide-tag-text {
+            font-size: 0.84rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .slide-title-hero {
+            font-size: 1.95rem;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .slide-subtitle-hero {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .slide-number-chip {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #94A3B8;
+            font-feature-settings: "tnum";
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ========================================================= */
+        /* PURE SCREENSHOT SHOWCASE (NO MAC WINDOWS, NO CUTOFFS) */
+        /* ========================================================= */
+        .showcase-stage {
+            width: 100%;
+            max-width: 1320px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            margin: 0.4rem 0 0.8rem 0;
+        }
+
+        /* Clean elevated presentation frame with soft shadow */
+        .pure-screenshot-frame {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* FULL NATURAL ASPECT RATIO: 100% VISIBLE WITH ALL BUTTONS */
+        .pure-screenshot-frame img {
+            width: auto;
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* ========================================================= */
+        /* CREATIVE CALLOUTS (CAPSULES, PIPELINES, GAUGES) */
+        /* ========================================================= */
+        .interactive-ribbon {
+            width: 100%;
+            max-width: 1320px;
+            display: flex;
+            gap: 1.1rem;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        /* Creative Capsule Card */
+        .capsule-card {
+            flex: 1;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
+            padding: 0.65rem 1.25rem 0.65rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .capsule-card:hover {
+            border-color: rgba(255, 90, 31, 0.35);
+            box-shadow: 0 8px 20px rgba(255, 90, 31, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .capsule-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--primary-soft);
+            color: var(--primary);
+            flex-shrink: 0;
+            box-shadow: inset 0 0 0 1px rgba(255, 90, 31, 0.2);
+        }
+
+        .capsule-badge.green {
+            background: var(--secondary-soft);
+            color: var(--secondary);
+            box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.2);
+        }
+
+        .capsule-badge.blue {
+            background: var(--blue-soft);
+            color: var(--blue-accent);
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+        }
+
+        .capsule-content {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .capsule-title {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .capsule-desc {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* Order Workflow Pipeline Component */
+        .pipeline-stepper {
+            width: 100%;
+            max-width: 1320px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 0.9rem 1.6rem;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+            position: relative;
+        }
+
+        .step-node {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F1F5F9;
+            border: 2px solid #CBD5E1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+        }
+
+        .step-node.active .node-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #FFFFFF;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .step-node.completed .node-circle {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: #FFFFFF;
+        }
+
+        .node-text strong {
+            display: block;
+            font-size: 0.84rem;
+            color: var(--text-main);
+        }
+
+        .node-text span {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+
+        .step-arrow {
+            color: #CBD5E1;
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        /* Circular Metric Stat Badges */
+        .stat-ring-card {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.2rem 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .ring-gauge {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            border: 4px solid var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-soft);
+            flex-shrink: 0;
+        }
+
+        .ring-gauge.green {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: var(--secondary-soft);
+        }
+
+        .ring-gauge.blue {
+            border-color: var(--blue-accent);
+            color: var(--blue-accent);
+            background: var(--blue-soft);
+        }
+
+        /* Fragment Build Engine */
+        .fragment {
+            opacity: 0;
+            transform: translateY(14px) scale(0.98);
+            transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .fragment.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .fragment.visible.pop-in {
+            animation: softPop 0.4s ease-out;
+        }
+
+        @keyframes softPop {
+            0% { transform: scale(0.92); opacity: 0; }
+            70% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Standard Slide Footer */
+        .slide-footer-clean {
+            width: 100%;
+            max-width: 1320px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--card-border);
+            padding-top: 0.65rem;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            margin-top: 0.6rem;
+        }
+
+        /* ========================================================= */
+        /* СЛАЙД 1: ТИТУЛЬНЫЙ В СВЕТЛОМ СТИЛЕ (ЭЛЕГАНТНЫЙ И СТРОГИЙ) */
+        /* ========================================================= */
+        .title-container-light {
+            width: 100%;
+            max-width: 1320px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .title-header-bar {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inst-title {
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: #1E293B;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .title-main-grid {
+            display: grid;
+            grid-template-columns: 58% 42%;
+            gap: 3.5rem;
+            align-items: center;
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        .title-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            text-align: left;
+        }
+
+        .hero-h1-light {
+            font-size: 2.85rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+        }
+
+        .hero-h1-light span {
+            color: var(--primary);
+        }
+
+        .hero-desc-light {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 650px;
+        }
+
+        .hero-tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.2rem;
+        }
+
+        .tag-pill {
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
+            color: #334155;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .tag-pill.orange {
+            background: var(--primary-soft);
+            border-color: rgba(255, 90, 31, 0.3);
+            color: var(--primary-dark);
+        }
+
+        .credentials-card-light {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            text-align: left;
+        }
+
+        .cred-heading {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid #F1F5F9;
+            padding-bottom: 0.6rem;
+        }
+
+        .cred-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .cred-lbl {
+            font-size: 0.74rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .cred-val-big {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .cred-val-sub {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        .title-bottom-light {
+            border-top: 1px solid var(--card-border);
+            padding-top: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.86rem;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-canvas"></div>
+    <div id="progressBar"></div>
+
+    <div class="deck-container" id="deckContainer">
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 1: ТИТУЛЬНЫЙ СЛАЙД (СВЕТЛЫЙ, СТРОГАЯ СЕТКА) -->
+        <!-- ========================================================= -->
+        <section class="slide active" id="slide-0">
+            <div class="title-container-light">
+                <div class="title-header-bar fragment visible">
+                    <span class="inst-title">Министерство образования Саратовской области • ГАПОУ СО «Балашовский техникум механизации сельского хозяйства»</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: var(--primary); letter-spacing: 0.05em;">МДК 02.02</span>
+                </div>
+
+                <div class="title-main-grid">
+                    <div class="title-text-col">
+                        <div style="display: flex; align-items: center; gap: 0.8rem;" class="fragment visible">
+                            <span class="slide-badge-pill">КУРСОВОЙ ПРОЕКТ</span>
+                            <span style="font-size: 0.85rem; color: var(--text-dim); font-weight: 600;">Специальность 09.02.07</span>
+                        </div>
+
+                        <div class="fragment" data-step="1">
+                            <h1 class="hero-h1-light">Разработка веб-сервиса службы быстрой доставки питания <span>«BiteGo»</span></h1>
+                            <p class="hero-desc-light">
+                                с личным кабинетом клиента и комплексной автоматизацией кухни, партионного учета склада и курьерской логистики
+                            </p>
+                        </div>
+
+                        <div class="hero-tag-cloud fragment" data-step="2">
+                            <span class="tag-pill orange">⚡ Dark Kitchen</span>
+                            <span class="tag-pill">ASP.NET Core 9 Minimal API</span>
+                            <span class="tag-pill">Vanilla JS ES6+ SPA</span>
+                            <span class="tag-pill">DaData API (ФИАС)</span>
+                            <span class="tag-pill">Фискализация 54-ФЗ</span>
+                            <span class="tag-pill">Экономика COGS</span>
+                        </div>
+                    </div>
+
+                    <div class="fragment" data-step="3">
+                        <div class="credentials-card-light">
+                            <div class="cred-heading">Паспорт курсового проекта</div>
+                            
+                            <div class="cred-item">
+                                <span class="cred-lbl">Разработал студент</span>
+                                <span class="cred-val-big">Евтухов Е.А.</span>
+                                <span class="cred-val-sub">4 курс, группа ИП-41</span>
+                            </div>
+
+                            <div class="cred-item">
+                                <span class="cred-lbl">Специальность</span>
+                                <span class="cred-val-big" style="font-size: 0.98rem;">09.02.07 Информационные системы и программирование</span>
+                            </div>
+
+                            <div class="cred-item">
+                                <span class="cred-lbl">Руководитель проекта</span>
+                                <span class="cred-val-big">Сухова Л.Г.</span>
+                                <span class="cred-val-sub">преподаватель спец. дисциплин</span>
+                            </div>
+
+                            <div class="cred-item">
+                                <span class="cred-lbl">Заведующая отделением</span>
+                                <span class="cred-val-big">Судатова Ю.А.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="title-bottom-light fragment" data-step="4">
+                    <span>г. Балашов, 2026 г.</span>
+                    <span style="font-weight: 700; color: #1E293B;">Защита курсового проекта</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 2: АКТУАЛЬНОСТЬ, ЦЕЛЬ И ЗАДАЧИ -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-1">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Введение</span>
+                        <span class="slide-tag-text">Анализ рынка общепита г. Балашов</span>
+                    </div>
+                    <h2 class="slide-title-hero">Актуальность, цель и задачи разработки</h2>
+                    <p class="slide-subtitle-hero">Создание независимой программной платформы для Dark Kitchen ресторанов</p>
+                </div>
+                <div class="slide-number-chip">02 / 18</div>
+            </div>
+
+            <div style="width: 100%; max-width: 1320px; flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+                    <div class="stat-ring-card fragment" data-step="1">
+                        <div class="ring-gauge">35%</div>
+                        <div>
+                            <strong style="display: block; font-size: 1rem; color: #0F172A;">Комиссии федеральных агрегаторов</strong>
+                            <span style="font-size: 0.85rem; color: #64748B;">Сторонние сервисы забирают от 25% до 35% с каждого чека, лишая кухню прибыли.</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-ring-card fragment" data-step="2">
+                        <div class="ring-gauge" style="border-color: #EF4444; color: #DC2626; background: #FEF2F2;">0%</div>
+                        <div>
+                            <strong style="display: block; font-size: 1rem; color: #0F172A;">Проблема ручного учета на кухне</strong>
+                            <span style="font-size: 0.85rem; color: #64748B;">Без живого списания заказы принимаются на отсутствующие продукты.</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-ring-card fragment" data-step="3">
+                        <div class="ring-gauge green">100%</div>
+                        <div>
+                            <strong style="display: block; font-size: 1rem; color: #0F172A;">Цель проекта «BiteGo»</strong>
+                            <span style="font-size: 0.85rem; color: #64748B;">Автономная веб-система полного цикла: клиент → кухня → склад → чек 54-ФЗ.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 18px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.04); height: 100%; display: flex; flex-direction: column; justify-content: space-around;" class="fragment" data-step="4">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; border-bottom: 2px solid #F1F5F9; padding-bottom: 0.75rem;">
+                        Инженерные задачи курсового проекта
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; gap: 0.9rem; align-items: center;">
+                            <span style="background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">1</span>
+                            <span style="color: #334155; font-size: 0.95rem; font-weight: 600;">Проектирование высоконагруженного RESTful API на платформе ASP.NET Core 9</span>
+                        </div>
+                        <div style="display: flex; gap: 0.9rem; align-items: center;">
+                            <span style="background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">2</span>
+                            <span style="color: #334155; font-size: 0.95rem; font-weight: 600;">Разработка реактивной клиентской витрины SPA (Mobile First) без фреймворков</span>
+                        </div>
+                        <div style="display: flex; gap: 0.9rem; align-items: center;">
+                            <span style="background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">3</span>
+                            <span style="color: #334155; font-size: 0.95rem; font-weight: 600;">Интеграция с DaData API для предиктивного поиска адресов и городов РФ</span>
+                        </div>
+                        <div style="display: flex; gap: 0.9rem; align-items: center;">
+                            <span style="background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">4</span>
+                            <span style="color: #334155; font-size: 0.95rem; font-weight: 600;">Автоматизация кухни, партионного учета StockLog и финансовой модели COGS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 3: АРХИТЕКТУРА И ТЕХНОЛОГИЧЕСКИЙ СТЕК -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-2">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Архитектура</span>
+                        <span class="slide-tag-text">Разделение ответственности и микросервисы</span>
+                    </div>
+                    <h2 class="slide-title-hero">Архитектура и технологический стек</h2>
+                    <p class="slide-subtitle-hero">Клиентский Single Page Application интерфейс и асинхронный .NET сервер</p>
+                </div>
+                <div class="slide-number-chip">03 / 18</div>
+            </div>
+
+            <div style="width: 100%; max-width: 1320px; flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; align-items: center;">
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 18px; padding: 1.8rem; box-shadow: 0 10px 25px rgba(0,0,0,0.04);" class="fragment" data-step="1">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">💻</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.4rem;">Frontend (Клиент SPA)</h3>
+                    <p style="font-size: 0.86rem; color: #64748B; margin-bottom: 0.9rem;">
+                        Нативный JavaScript без громоздких фреймворков. Загрузка витрины за 0.35 секунды.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <span class="tag-pill orange">Vanilla JS (ES6+)</span>
+                        <span class="tag-pill">CSS3 Custom Props</span>
+                        <span class="tag-pill">CSS Grid & Flexbox</span>
+                        <span class="tag-pill">Mobile First UI</span>
+                        <span class="tag-pill">Dynamic SVG</span>
+                        <span class="tag-pill">Hash Router</span>
+                    </div>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 18px; padding: 1.8rem; box-shadow: 0 10px 25px rgba(0,0,0,0.04);" class="fragment" data-step="2">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">⚙️</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.4rem;">Backend (.NET 9 C#)</h3>
+                    <p style="font-size: 0.86rem; color: #64748B; margin-bottom: 0.9rem;">
+                        Высокопроизводительное веб-API с асинхронными эндпоинтами и JWT-авторизацией.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <span class="tag-pill orange">C# 13 / .NET 9</span>
+                        <span class="tag-pill">ASP.NET Core API</span>
+                        <span class="tag-pill">JWT Bearer Auth</span>
+                        <span class="tag-pill">EF Core 9</span>
+                        <span class="tag-pill">Argon2 / BCrypt</span>
+                        <span class="tag-pill">OpenAPI / Swagger</span>
+                    </div>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 18px; padding: 1.8rem; box-shadow: 0 10px 25px rgba(0,0,0,0.04);" class="fragment" data-step="3">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">🗄️</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.4rem;">Данные и интеграции</h3>
+                    <p style="font-size: 0.86rem; color: #64748B; margin-bottom: 0.9rem;">
+                        Транзакционная реляционная модель с защитой ACID и интеграцией внешних сервисов.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <span class="tag-pill orange">SQLite / EF Core</span>
+                        <span class="tag-pill">Транзакции ACID</span>
+                        <span class="tag-pill">DaData API (ФИАС)</span>
+                        <span class="tag-pill">Стандарты 54-ФЗ</span>
+                        <span class="tag-pill">Партионный StockLog</span>
+                        <span class="tag-pill">Модель COGS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 4: ГЛАВНАЯ СТРАНИЦА ВЕБ-СЕРВИСА (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-3">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Клиентская витрина</span>
+                        <span class="slide-tag-text">Рисунок 1 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Главная страница веб-сервиса «BiteGo» (г. Балашов)</h2>
+                    <p class="slide-subtitle-hero">Интуитивная клиентская витрина с выбором города и бонусным балансом</p>
+                </div>
+                <div class="slide-number-chip">04 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig01_home.png" alt="Главная страница веб-сервиса BiteGo">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">⚡</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Динамическая шапка</div>
+                        <div class="capsule-desc">Город Балашов, баланс бонусов и корзина</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🎨</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Адаптивный дизайн</div>
+                        <div class="capsule-desc">Идеальная верстка на смартфонах и ПК</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🚀</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Hash-навигация SPA</div>
+                        <div class="capsule-desc">Мгновенный переход без перезагрузки страницы</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 5: КАТАЛОГ МЕНЮ С ФИЛЬТРАЦИЕЙ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-4">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Каталог меню</span>
+                        <span class="slide-tag-text">Рисунок 2 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Каталог блюд с мгновенной фильтрацией категорий</h2>
+                    <p class="slide-subtitle-hero">Аппетитные карточки блюд с граммовками, КБЖУ и кнопками прямого заказа</p>
+                </div>
+                <div class="slide-number-chip">05 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig02_menu.png" alt="Каталог меню BiteGo">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">🍕</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Чипсы категорий</div>
+                        <div class="capsule-desc">Пицца, Бургеры, Закуски, Напитки, Десерты</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">📊</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Точный КБЖУ и вес</div>
+                        <div class="capsule-desc">Полная прозрачность состава каждого блюда</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🛒</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Кнопки «Выбрать»</div>
+                        <div class="capsule-desc">Мгновенный переход к конструктору пиццы</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 6: КАСТОМИЗАТОР РЕЦЕПТА ПИЦЦЫ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-5">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Кастомизатор</span>
+                        <span class="slide-tag-text">Рисунок 3 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Модальное окно кастомизатора рецепта пиццы</h2>
+                    <p class="slide-subtitle-hero">Исключение ингредиентов со скидкой 40 ₽ и выбор премиальных топпингов</p>
+                </div>
+                <div class="slide-number-chip">06 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig03_customizer.png" alt="Кастомизатор рецепта пиццы">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">➖</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Скидка -40 ₽ за компонент</div>
+                        <div class="capsule-desc">Убираете лук или соус — платите меньше!</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🧀</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Премиум топпинги</div>
+                        <div class="capsule-desc">Сырный бортик (+150 ₽) и бекон (+90 ₽)</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">✨</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Кнопка в наличии</div>
+                        <div class="capsule-desc">Четкая фиксация в корзину с пересчетом чека</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 7: ВЫБОР ГОРОДА DADATA API (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-6">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Гео-интеграция</span>
+                        <span class="slide-tag-text">Рисунок 4 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Интеграция с DaData API: выбор города и улиц</h2>
+                    <p class="slide-subtitle-hero">Предиктивный поиск населенных пунктов РФ и улиц г. Балашов через реестр ФИАС</p>
+                </div>
+                <div class="slide-number-chip">07 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig04_city_modal.png" alt="Выбор города DaData API">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">📍</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Реестр ФИАС / КЛАДР</div>
+                        <div class="capsule-desc">Исключение опечаток при вводе адреса</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">⚡</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Быстрые города</div>
+                        <div class="capsule-desc">Балашов, Саратов, Москва, Самара в 1 клик</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🏠</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Автоподстановка домов</div>
+                        <div class="capsule-desc">Ускорение оформления заказа в 3 раза</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 8: КОРЗИНА ПОКУПАТЕЛЯ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-7">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Корзина</span>
+                        <span class="slide-tag-text">Рисунок 5 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Боковой дровер корзины с кастомными блюдами</h2>
+                    <p class="slide-subtitle-hero">Фиксация модификаций, списание бонусов и кнопка оформления заказа</p>
+                </div>
+                <div class="slide-number-chip">08 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig05_cart.png" alt="Корзина покупателя с модификаторами">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">📋</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Модификаторы рецепта</div>
+                        <div class="capsule-desc">Наглядное отображение удаленных и добавленных опций</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🎁</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Оплата бонусами</div>
+                        <div class="capsule-desc">Списание накопленных баллов до 30% стоимости</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">💳</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Кнопка «Оформить заказ»</div>
+                        <div class="capsule-desc">Четкий переход к форме адреса и доставки</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 9: ОНЛАЙН-ТРЕКЕР ЗАКАЗА (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-8">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Трекинг кухни</span>
+                        <span class="slide-tag-text">Рисунок 6 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Живой онлайн-трекер движения заказа в профиле</h2>
+                    <p class="slide-subtitle-hero">Пять этапов кухни, динамический таймер и подтверждение получения гостем</p>
+                </div>
+                <div class="slide-number-chip">09 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig06_tracker.png" alt="Онлайн-трекер статуса заказа">
+                </div>
+            </div>
+
+            <!-- ИНТЕРАКТИВНЫЙ PIPELINE ЦИКЛА ЗАКАЗА -->
+            <div class="pipeline-stepper fragment" data-step="1">
+                <div class="step-node completed">
+                    <div class="node-circle">✓</div>
+                    <div class="node-text"><strong>Новый</strong><span>Поступил</span></div>
+                </div>
+                <span class="step-arrow">➔</span>
+                <div class="step-node completed">
+                    <div class="node-circle">✓</div>
+                    <div class="node-text"><strong>Готовится</strong><span>Цех пиццы</span></div>
+                </div>
+                <span class="step-arrow">➔</span>
+                <div class="step-node active">
+                    <div class="node-circle">3</div>
+                    <div class="node-text"><strong>Собран</strong><span>На контроле</span></div>
+                </div>
+                <span class="step-arrow">➔</span>
+                <div class="step-node">
+                    <div class="node-circle">4</div>
+                    <div class="node-text"><strong>В пути</strong><span>Курьер</span></div>
+                </div>
+                <span class="step-arrow">➔</span>
+                <div class="step-node">
+                    <div class="node-circle">5</div>
+                    <div class="node-text"><strong>Доставлен</strong><span>Финал</span></div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 10: ЭЛЕКТРОННЫЙ ЧЕК 54-ФЗ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-9">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Фискализация</span>
+                        <span class="slide-tag-text">Рисунок 7 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Электронный фискальный кассовый чек (54-ФЗ)</h2>
+                    <p class="slide-subtitle-hero">Полное соответствие законодательству РФ об электронной коммерции и ФНС</p>
+                </div>
+                <div class="slide-number-chip">10 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig07_receipt.png" alt="Электронный кассовый чек по 54-ФЗ">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">🏢</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Юридические данные</div>
+                        <div class="capsule-desc">ООО «БайтГоу Доставка», ИНН 6440012345, г. Балашов</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">📋</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Позиционный расчет</div>
+                        <div class="capsule-desc">Точный перечень блюд, скидка бонусами и сумма</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">📱</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Фискальный QR-код</div>
+                        <div class="capsule-desc">Мгновенная валидация в приложении ФНС РФ</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 11: ПАНЕЛЬ ОПЕРАТОРА ЗАКАЗОВ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-10">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Управление кухней</span>
+                        <span class="slide-tag-text">Рисунок 9 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Панель оператора: управление заказами кухни</h2>
+                    <p class="slide-subtitle-hero">Диспетчеризация входящих чеков в реальном времени и назначение курьеров</p>
+                </div>
+                <div class="slide-number-chip">11 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig09_admin_orders.png" alt="Заказы кухни в панели оператора">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">📦</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Быстрая смена статуса</div>
+                        <div class="capsule-desc">«Принять в готовку» → «Передать курьеру» → «Доставлен»</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🚗</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Назначение курьера</div>
+                        <div class="capsule-desc">Список только активных сотрудников на смене</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🔒</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Защита доступа RBAC</div>
+                        <div class="capsule-desc">Строгая авторизация по роли Admin через JWT</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 12: СКЛАД И СТОП-ЛИСТЫ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-11">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Складской учет</span>
+                        <span class="slide-tag-text">Рисунок 10 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Управление складскими остатками и стоп-листами</h2>
+                    <p class="slide-subtitle-hero">Точный учет запасов в штуках и блокировка продаж при нулевом остатке сырья</p>
+                </div>
+                <div class="slide-number-chip">12 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig10_admin_stock.png" alt="Склад кухни и стоп-листы">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">🛑</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Стоп-лист в 1 клик</div>
+                        <div class="capsule-desc">Мгновенное снятие блюда с продажи при нехватке сырья</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🔢</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Учет остатка в штуках</div>
+                        <div class="capsule-desc">Автоматическое списание ингредиентов при закрытии чека</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">➕</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Пополнение склада</div>
+                        <div class="capsule-desc">Оперативный приход партий с фиксацией закупочной цены</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 13: МОДАЛКА ДОБАВЛЕНИЯ БЛЮДА (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-12">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Управление меню</span>
+                        <span class="slide-tag-text">Рисунок 11 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Модальный модуль добавления нового блюда в меню</h2>
+                    <p class="slide-subtitle-hero">Расширение ассортимента кухни оператором без необходимости правок в коде</p>
+                </div>
+                <div class="slide-number-chip">13 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig11_admin_add_dish.png" alt="Модальное окно добавления блюда в меню">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">🍔</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Атрибуты блюда</div>
+                        <div class="capsule-desc">Название, категория, отпускная цена, вес, калории</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">📝</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Авторазбор состава</div>
+                        <div class="capsule-desc">Ингредиенты автоматически подключаются к кастомизатору</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🖼️</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Подключение фото</div>
+                        <div class="capsule-desc">Загрузка собственного изображения или выбор пресета</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 14: ЖУРНАЛ СЫРЬЯ STOCKLOG (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-13">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Складской аудит</span>
+                        <span class="slide-tag-text">Рисунок 12 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Электронный журнал движения сырья StockLog</h2>
+                    <p class="slide-subtitle-hero">Тотальный аудит партий сырья: поставки, списания на заказы, брак и ответственность</p>
+                </div>
+                <div class="slide-number-chip">14 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig12_admin_stocklog.png" alt="Журнал движения сырья StockLog">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">📜</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Неизменяемый протокол</div>
+                        <div class="capsule-desc">Дата, время, тип операции («Приход», «Списание», «Брак»)</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">💵</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Входная себестоимость</div>
+                        <div class="capsule-desc">Фиксация закупки для точного расчета фудкоста кухни</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">🛡️</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Исключение потерь</div>
+                        <div class="capsule-desc">Персональная ответственность оператора за списания</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 15: КУРЬЕРСКАЯ СЛУЖБА (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-14">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Логистика курьеров</span>
+                        <span class="slide-tag-text">Рисунок 13 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Модуль диспетчеризации курьеров и смен</h2>
+                    <p class="slide-subtitle-hero">Контроль парка доставки, учет личного авто/скутеров и сдельная оплата труда</p>
+                </div>
+                <div class="slide-number-chip">15 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig13_admin_couriers.png" alt="Управление курьерами">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">🚗</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Управление сменами</div>
+                        <div class="capsule-desc">Статусы «Свободен», «На доставке», «Не на смене»</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🛵</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Учет транспорта</div>
+                        <div class="capsule-desc">Разделение на курьеров на авто и скутерах</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">💰</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Сдельная ставка 150 ₽</div>
+                        <div class="capsule-desc">Автоматическое начисление выплаты за каждый адрес</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 16: ФИНАНСОВЫЕ KPI И МОДЕЛЬ COGS (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-15">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Экономика COGS</span>
+                        <span class="slide-tag-text">Рисунок 14 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Финансовые KPI-карточки прибыльности сервиса</h2>
+                    <p class="slide-subtitle-hero">Внедрение стандарта Cost of Goods Sold (фудкост 38%) и расчет чистой прибыли</p>
+                </div>
+                <div class="slide-number-chip">16 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig14_admin_stats.png" alt="KPI карточки прибыльности кухни">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">💵</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Выручка: 14 692 ₽</div>
+                        <div class="capsule-desc">Объем продаж готовой еды за расчетный период</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🥩</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Фудкост COGS: 4 414 ₽</div>
+                        <div class="capsule-desc">Строго 38% чека — списание только выданных продуктов</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">📈</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Чистая прибыль: +8 628 ₽</div>
+                        <div class="capsule-desc">Высокая рентабельность 58.7% за вычетом курьеров</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 17: ИНТЕРАКТИВНЫЕ SVG-ГРАФИКИ (БОЛЬШОЙ ЧИСТЫЙ СКРИН) -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-16">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Аналитика</span>
+                        <span class="slide-tag-text">Рисунок 15 в курсовом проекте</span>
+                    </div>
+                    <h2 class="slide-title-hero">Векторные SVG-графики динамики выручки и долей</h2>
+                    <p class="slide-subtitle-hero">Интерактивные столбцы выручки по дням и Donut-диаграмма структуры спроса блюд</p>
+                </div>
+                <div class="slide-number-chip">17 / 18</div>
+            </div>
+
+            <div class="showcase-stage fragment visible">
+                <div class="pure-screenshot-frame">
+                    <img src="screenshots/fig15_admin_charts.png" alt="Векторные SVG графики динамики выручки">
+                </div>
+            </div>
+
+            <div class="interactive-ribbon">
+                <div class="capsule-card fragment" data-step="1">
+                    <div class="capsule-badge">📊</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Динамический SVG</div>
+                        <div class="capsule-desc">Отрисовка без внешних библиотек с поддержкой ховера</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="2">
+                    <div class="capsule-badge green">🍩</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Donut-диаграмма</div>
+                        <div class="capsule-desc">Пицца 55%, Бургеры 30%, Напитки и Десерты 15%</div>
+                    </div>
+                </div>
+                <div class="capsule-card fragment" data-step="3">
+                    <div class="capsule-badge blue">💡</div>
+                    <div class="capsule-content">
+                        <div class="capsule-title">Интерактивные подсказки</div>
+                        <div class="capsule-desc">Сумма чеков и количество заказов по каждому дню</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Курсовой проект: Евтухов Е.А. (ИП-41)</span>
+                <span>МДК 02.02 Инструментальные средства разработки ПО</span>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- СЛАЙД 18: ИТОГИ ВНЕДРЕНИЯ И ЗАКЛЮЧЕНИЕ -->
+        <!-- ========================================================= -->
+        <section class="slide" id="slide-17">
+            <div class="slide-header-clean">
+                <div>
+                    <div class="slide-badge-row">
+                        <span class="slide-badge-pill">Итоги проекта</span>
+                        <span class="slide-tag-text">Апробация и внедрение</span>
+                    </div>
+                    <h2 class="slide-title-hero">Результаты внедрения и защита курсового проекта</h2>
+                    <p class="slide-subtitle-hero">Полное достижение поставленных целей и готовность сервиса к эксплуатации</p>
+                </div>
+                <div class="slide-number-chip">18 / 18</div>
+            </div>
+
+            <div style="width: 100%; max-width: 1320px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin: 0.6rem 0 1.2rem 0;" class="fragment visible">
+                <div class="stat-ring-card">
+                    <div class="ring-gauge green">100%</div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; color: #0F172A;">Тест-кейсы</strong>
+                        <span style="font-size: 0.78rem; color: #64748B;">Успешные тесты модулей</span>
+                    </div>
+                </div>
+                <div class="stat-ring-card">
+                    <div class="ring-gauge">&lt;25мс</div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; color: #0F172A;">Отклик API</strong>
+                        <span style="font-size: 0.78rem; color: #64748B;">Асинхронный C# .NET 9</span>
+                    </div>
+                </div>
+                <div class="stat-ring-card">
+                    <div class="ring-gauge green">98</div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; color: #0F172A;">Lighthouse</strong>
+                        <span style="font-size: 0.78rem; color: #64748B;">Быстрая SPA-витрина</span>
+                    </div>
+                </div>
+                <div class="stat-ring-card">
+                    <div class="ring-gauge blue">54-ФЗ</div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; color: #0F172A;">Законодательство</strong>
+                        <span style="font-size: 0.78rem; color: #64748B;">Фискальные кассовые чеки</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 100%; max-width: 1320px; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem;" class="fragment" data-step="1">
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                    <h4 style="color: var(--primary); font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Разработанный программный комплекс</h4>
+                    <p style="font-size: 0.88rem; color: #475569; line-height: 1.45;">
+                        Создан замкнутый цикл доставки Dark Kitchen: витрина с кастомизатором блюд, DaData гео-поиск, онлайн-трекер кухни, рабочее место оператора, журнал сырья StockLog, курьерская логистика и расчет рентабельности COGS.
+                    </p>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                    <h4 style="color: var(--secondary); font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Перспективы развития сервиса</h4>
+                    <p style="font-size: 0.88rem; color: #475569; line-height: 1.45;">
+                        Подключение онлайн-эквайринга Системы быстрых платежей (СБП по динамическому QR), выпуск кросс-платформенного мобильного PWA-приложения и масштабирование сети на соседние районы Саратовской области.
+                    </p>
+                </div>
+            </div>
+
+            <div class="fragment" data-step="2" style="text-align: center; margin-top: 0.8rem;">
+                <h1 style="font-size: 3rem; font-weight: 900; color: #0F172A; letter-spacing: -0.02em;">
+                    Спасибо за внимание!
+                </h1>
+                <p style="font-size: 1.1rem; color: #64748B; margin-top: 0.2rem;">
+                    Готов ответить на вопросы государственной экзаменационной комиссии
+                </p>
+            </div>
+
+            <div class="slide-footer-clean">
+                <span>Выполнил: студент Евтухов Е.А. (ИП-41)</span>
+                <span>Руководитель: преподаватель Сухова Л.Г.</span>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // =============================================================
+        // ДВИЖОК ПРЕЗЕНТАЦИИ (ЧИСТЫЙ РЕЖИМ БЕЗ ЛИШНЕЙ НАВИГАЦИИ)
+        // =============================================================
+        
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const progressBar = document.getElementById('progressBar');
+        let currentSlideIdx = 0;
+        let currentStep = 0;
+
+        function getSlideMaxSteps(slideEl) {
+            const fragments = slideEl.querySelectorAll('.fragment[data-step]');
+            let max = 0;
+            fragments.forEach(f => {
+                const s = parseInt(f.getAttribute('data-step') || '0', 10);
+                if (s > max) max = s;
+            });
+            return max;
+        }
+
+        function updateSlideView(direction = 'next') {
+            slides.forEach((slide, idx) => {
+                slide.classList.remove('active', 'prev');
+                if (idx === currentSlideIdx) {
+                    slide.classList.add('active');
+                } else if (idx < currentSlideIdx) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            // Верхний индикатор прогресса
+            const progressPct = ((currentSlideIdx) / (slides.length - 1)) * 100;
+            progressBar.style.width = progressPct + '%';
+
+            applySlideSteps();
+        }
+
+        function applySlideSteps() {
+            const activeSlide = slides[currentSlideIdx];
+            const fragments = activeSlide.querySelectorAll('.fragment');
+            
+            fragments.forEach(frag => {
+                const stepReq = parseInt(frag.getAttribute('data-step') || '0', 10);
+                if (stepReq <= currentStep) {
+                    if (!frag.classList.contains('visible')) {
+                        frag.classList.add('visible', 'pop-in');
+                    }
+                } else {
+                    frag.classList.remove('visible', 'pop-in');
+                }
+            });
+        }
+
+        // Шаг вперед (Пробел, стрелка вправо, Enter)
+        function next() {
+            const activeSlide = slides[currentSlideIdx];
+            const maxSteps = getSlideMaxSteps(activeSlide);
+
+            if (currentStep < maxSteps) {
+                currentStep++;
+                applySlideSteps();
+            } else {
+                if (currentSlideIdx < slides.length - 1) {
+                    currentSlideIdx++;
+                    currentStep = 0;
+                    updateSlideView('next');
+                }
+            }
+        }
+
+        // Шаг назад (Стрелка влево, Backspace)
+        function prev() {
+            if (currentStep > 0) {
+                currentStep--;
+                applySlideSteps();
+            } else {
+                if (currentSlideIdx > 0) {
+                    currentSlideIdx--;
+                    currentStep = getSlideMaxSteps(slides[currentSlideIdx]);
+                    updateSlideView('prev');
+                }
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                next();
+            } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'Enter' || e.code === 'PageDown') {
+                e.preventDefault();
+                next();
+            } else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'Backspace' || e.code === 'PageUp') {
+                e.preventDefault();
+                prev();
+            } else if (e.code === 'Home') {
+                e.preventDefault();
+                currentSlideIdx = 0;
+                currentStep = 0;
+                updateSlideView('prev');
+            } else if (e.code === 'End') {
+                e.preventDefault();
+                currentSlideIdx = slides.length - 1;
+                currentStep = getSlideMaxSteps(slides[currentSlideIdx]);
+                updateSlideView('next');
+            } else if (e.code === 'KeyF') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (window.getSelection().toString().length > 0) return;
+            next();
+        });
+
+        updateSlideView();
+    </script>
+</body>
+</html>

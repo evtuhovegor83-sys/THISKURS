@@ -1,0 +1,36 @@
+# Visual Studio / .NET Build Artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+# Visual Studio Code & IDEs
+.vs/
+.vscode/
+.idea/
+*.swp
+*.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+env/
+venv/
+.venv/
+
+# Windows OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary logs
+*.log

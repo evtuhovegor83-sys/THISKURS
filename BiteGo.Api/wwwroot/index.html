@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteGo («Быстрый Укус») — Сервис доставки еды в Балашове</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-container">
+                <a class="logo-group" onclick="window.navigateTo('/')">
+                    <div class="logo-icon">🍔</div>
+                    <div class="logo-text">
+                        <h1>BiteGo</h1>
+                        <p>Быстрый Укус</p>
+                    </div>
+                </a>
+
+                <div class="city-badge" onclick="window.promptChangeCity()" style="cursor: pointer;" title="Нажмите для выбора города">
+                    <span>📍</span>
+                    <span>Доставка: <strong id="headerCityName">г. Балашов</strong></span>
+                </div>
+
+                <nav class="nav-links">
+                    <a class="nav-link active" onclick="window.navigateTo('/')">Главная</a>
+                    <a class="nav-link" onclick="window.navigateTo('/menu')">Меню</a>
+                    <a class="nav-link" onclick="window.navigateTo('/about')">О нас</a>
+                    <a class="nav-link" onclick="window.navigateTo('/profile')">Мои заказы</a>
+                    <a class="nav-link admin-nav-link" id="adminNavLink" style="display:none;" onclick="window.navigateTo('/admin')">⚡ Оператор</a>
+                </nav>
+
+                <div class="header-actions">
+                    <div id="userBonusBadge" class="bonus-badge" style="display:none;">
+                        <span>💎</span>
+                        <span id="userBonusValue">0</span>
+                        <span>баллов</span>
+                    </div>
+
+                    <div id="authBtnContainer">
+                        <button class="btn-secondary" onclick="window.openAuthModal()">
+                            <span>👤</span>
+                            <span>Войти</span>
+                        </button>
+                    </div>
+
+                    <button class="cart-btn" onclick="window.openCart()">
+                        <span style="font-weight: 700;">Корзина</span>
+                        <span id="cartTotalPrice">0 ₽</span>
+                        <span id="cartBadgeCount" class="cart-badge-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SPA CONTENT CONTAINER -->
+        <main id="content"></main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="logo-group" style="margin-bottom: 1rem;">
+                        <span style="font-size: 1.6rem;">🍔</span>
+                        <h2 style="font-size: 1.3rem; font-weight: 800; color: #FFF;">BiteGo Балашов</h2>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
+                        Сервис быстрой доставки горячей пиццы, бургеров и роллов. Собственная кухня в г. Балашов, отборные фермерские продукты и быстрая доставка до двери.
+                    </p>
+                    <div style="font-size: 0.85rem; color: var(--text-dim);">
+                        Кухня и пункт выдачи: г. Балашов, ул. Ленина, д. 18
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Меню BiteGo</h3>
+                    <ul class="footer-links">
+                        <li><a onclick="window.navigateTo('/menu?cat=1')">🍕 Горячая пицца</a></li>
+                        <li><a onclick="window.navigateTo('/menu?cat=2')">🍔 Сочные бургеры</a></li>
+                        <li><a onclick="window.navigateTo('/menu?cat=3')">🍣 Свежие роллы</a></li>
+                        <li><a onclick="window.navigateTo('/menu?cat=4')">🍫 Десерты</a></li>
+                        <li><a onclick="window.navigateTo('/menu?cat=5')">🥤 Напитки и морсы</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Покупателям</h3>
+                    <ul class="footer-links">
+                        <li><a onclick="window.navigateTo('/about')">Условия доставки и оплаты</a></li>
+                        <li><a onclick="window.navigateTo('/about')">Программа лояльности (5% кэшбэк)</a></li>
+                        <li><a onclick="window.navigateTo('/profile')">История заказов и чеки</a></li>
+                        <li><a onclick="window.openAuthModal()">Регистрация / Вход</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Контакты службы заботы</h3>
+                    <p style="font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+                        8 (800) 555-35-35
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                        Ежедневно с 10:00 до 23:00
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">
+                        Email: support@bitego.ru
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>© 2026 BiteGo («Быстрый Укус»). Быстрая доставка еды в г. Балашов. Все права защищены.</div>
+                <div>г. Балашов • Доставка свежих и горячих блюд • Ежедневно с 10:00 до 23:00</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL: PRODUCT CUSTOMIZER -->
+    <div id="customizerModal" class="modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close-btn" onclick="window.closeCustomizer()">✕</button>
+            <div id="customizerBody"></div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div id="cartDrawerOverlay" class="cart-drawer-overlay" onclick="window.closeCart(event)">
+        <div class="cart-drawer" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h3 style="font-size: 1.2rem; font-weight: 800;">Корзина BiteGo</h3>
+                <button class="modal-close-btn" style="position: static;" onclick="window.closeCart()">✕</button>
+            </div>
+            <div id="cartItemsList" class="cart-items-list"></div>
+            <div class="cart-footer">
+                <div class="cart-summary-line">
+                    <span>Сумма заказа:</span>
+                    <span id="cartSubtotal" style="font-weight: 700;">0 ₽</span>
+                </div>
+                <div id="cartBonusRow" class="cart-summary-line" style="display:none; color: #FFA477;">
+                    <span>Списание бонусов:</span>
+                    <span id="cartBonusDiscount" style="font-weight: 700;">-0 ₽</span>
+                </div>
+                <div class="cart-summary-line">
+                    <span>Доставка по Балашову:</span>
+                    <span style="color: var(--success); font-weight: 700;">Бесплатно</span>
+                </div>
+                <div class="cart-summary-total">
+                    <span>К оплате:</span>
+                    <span id="cartFinalTotal" style="color: var(--primary);">0 ₽</span>
+                </div>
+                <button id="cartCheckoutBtn" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.85rem;" onclick="window.openCheckout()">
+                    Оформить доставку
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHECKOUT -->
+    <div id="checkoutModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 580px;">
+            <button class="modal-close-btn" onclick="window.closeCheckout()">✕</button>
+            <div style="padding: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Оформление заказа</h2>
+                
+                <div style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: var(--bg-input); padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.2rem;">Город доставки:</label>
+                        <select id="orderCity" class="btn-secondary" style="width: 100%; padding: 0.45rem 0.6rem; font-weight: 700; color: #FFF; background: var(--bg-card); border-radius: var(--radius-sm);" onchange="window.handleCityChange(this.value)">
+                            <option value="Балашов" selected>📍 г. Балашов (Саратовская обл.)</option>
+                            <option value="Саратов">📍 г. Саратов</option>
+                            <option value="Энгельс">📍 г. Энгельс</option>
+                            <option value="Ртищево">📍 г. Ртищево</option>
+                            <option value="Борисоглебск">📍 г. Борисоглебск</option>
+                        </select>
+                    </div>
+                    <div style="text-align: right; font-size: 0.8rem; color: var(--text-dim); white-space: nowrap;">
+                        <div>Время доставки:</div>
+                        <strong style="color: var(--primary);">~35 мин</strong>
+                    </div>
+                </div>
+
+                <form id="checkoutForm" onsubmit="window.submitOrder(event)">
+                    <div style="margin-bottom: 1rem; position: relative;">
+                        <label id="orderStreetLabel" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Улица в Балашове *</label>
+                        <input type="text" id="orderStreet" class="btn-secondary" style="width: 100%; text-align: left; border-radius: var(--radius-sm); padding: 0.65rem;" placeholder="Начните вводить (например: Ленина, Советская)" autocomplete="off" required oninput="window.handleAddressInput(this.value)">
+                        <div id="addressSuggestions" class="suggest-dropdown" style="display:none;"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Дом *</label>
+                            <input type="text" id="orderHouse" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="18" required>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Кв. / Офис</label>
+                            <input type="text" id="orderApartment" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="42">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Подъезд</label>
+                            <input type="text" id="orderEntrance" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="2">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Этаж</label>
+                            <input type="text" id="orderFloor" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="4">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Домофон</label>
+                            <input type="text" id="orderIntercom" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="42K">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Способ оплаты при получении *</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <label class="custom-checkbox-label" style="flex: 1;">
+                                <input type="radio" name="paymentMethod" value="Card" checked>
+                                <span>💳 Картой курьеру</span>
+                            </label>
+                            <label class="custom-checkbox-label" style="flex: 1;">
+                                <input type="radio" name="paymentMethod" value="Cash">
+                                <span>💵 Наличными курьеру</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- BONUS REDEMPTION -->
+                    <div id="bonusRedeemBox" style="background: var(--bg-input); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; display:none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 700; font-size: 0.9rem;">💎 Баллы лояльности</span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Доступно: <strong id="checkoutAvailableBonus">0</strong></span>
+                        </div>
+                        <label class="custom-checkbox-label">
+                            <input type="checkbox" id="useBonusesCheckbox" onchange="window.toggleBonusUse(this.checked)">
+                            <span>Списать баллы (до 30% от чека)</span>
+                        </label>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-size: 0.85rem; margin-bottom: 0.3rem;">Комментарий к заказу</label>
+                        <input type="text" id="orderNote" class="btn-secondary" style="width: 100%; border-radius: var(--radius-sm); padding: 0.6rem;" placeholder="Например: позвоните за 5 минут, спит ребенок">
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Итоговая сумма:</div>
+                            <div id="checkoutTotalPriceDisplay" style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">0 ₽</div>
+                        </div>
+                        <button type="submit" id="submitOrderBtn" class="btn-primary" style="padding: 0.75rem 2rem;">
+                            Подтвердить заказ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AUTHENTICATION & DEMO LOGIN -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 440px;">
+            <button class="modal-close-btn" onclick="window.closeAuthModal()">✕</button>
+            <div style="padding: 1.75rem;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🍔</div>
+                    <h2 style="font-size: 1.4rem; font-weight: 800;">Вход в BiteGo</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Доставка еды в г. Балашов</p>
+                </div>
+
+                <!-- TABS: LOGIN / REGISTER -->
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+                    <button id="tabLoginBtn" class="btn-primary" style="flex: 1; padding: 0.5rem;" onclick="window.switchAuthTab('login')">Вход</button>
+                    <button id="tabRegisterBtn" class="btn-secondary" style="flex: 1; padding: 0.5rem;" onclick="window.switchAuthTab('register')">Регистрация</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="window.handleLoginSubmit(event)">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Телефон</label>
+                        <input type="text" id="loginPhone" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="+7 (999) 000-00-00" required>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Пароль</label>
+                        <input type="password" id="loginPassword" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 0.75rem;">Войти в аккаунт</button>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="registerForm" style="display:none;" onsubmit="window.handleRegisterSubmit(event)">
+                    <div style="margin-bottom: 0.75rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Ваше ФИО *</label>
+                        <input type="text" id="regName" class="btn-secondary" style="width: 100%; padding: 0.6rem;" placeholder="Иван Смирнов" required>
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Телефон *</label>
+                        <input type="text" id="regPhone" class="btn-secondary" style="width: 100%; padding: 0.6rem;" placeholder="+7 (999) 111-22-33" required>
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Email (для чеков)</label>
+                        <input type="email" id="regEmail" class="btn-secondary" style="width: 100%; padding: 0.6rem;" placeholder="ivan@mail.ru">
+                    </div>
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Пароль *</label>
+                        <input type="password" id="regPassword" class="btn-secondary" style="width: 100%; padding: 0.6rem;" placeholder="Минимум 6 символов" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 0.75rem;">Зарегистрироваться (+100 бонусов)</button>
+                </form>
+
+                <!-- DEMO MODE CHIPS (ДЛЯ УСПЕШНОЙ ЗАЩИТЫ КУРСОВОЙ!) -->
+                <div id="demoAccountsSection" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 0.6rem; text-align: center;">
+                        Быстрый вход для комиссии (Demo-режим)
+                    </div>
+                    <div id="demoChipsContainer" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CASH REGISTER RECEIPT (КАССОВЫЙ ЧЕК BITEGO) -->
+    <div id="receiptModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 420px; background: transparent; border: none; box-shadow: none;">
+            <button class="modal-close-btn" style="background: rgba(0,0,0,0.8); top: -10px; right: 10px;" onclick="window.closeReceipt()">✕</button>
+            <div id="receiptContent" class="receipt-paper"></div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="btn-primary" onclick="window.printReceipt()">🖨️ Распечатать чек</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD PRODUCT TO MENU (ADMIN) -->
+    <div id="addProductModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 580px;">
+            <button class="modal-close-btn" onclick="window.closeAddProductModal()">✕</button>
+            <div style="padding: 1.5rem;">
+                <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem;">➕ Добавление нового блюда</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Позиция сразу появится в каталоге меню и оприходуется на складе кухни</p>
+
+                <form id="addProductForm" onsubmit="window.submitNewProduct(event)">
+                    <div style="margin-bottom: 0.85rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Название блюда *</label>
+                        <input type="text" id="newProdName" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="например: Двойной Чизбургер Барбекю" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Категория меню *</label>
+                            <select id="newProdCategory" class="btn-secondary" style="width: 100%; padding: 0.65rem; background: var(--bg-input); color: #FFF;" required>
+                                <option value="2">🍔 Бургеры</option>
+                                <option value="1">🍕 Пицца</option>
+                                <option value="3">🍣 Роллы</option>
+                                <option value="4">🍫 Десерты</option>
+                                <option value="5">🥤 Напитки</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Розничная цена (₽) *</label>
+                            <input type="number" id="newProdPrice" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="390" min="1" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Вес (г)</label>
+                            <input type="number" id="newProdWeight" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="320" min="1">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Калории (ккал)</label>
+                            <input type="number" id="newProdCalories" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="580" min="1">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Начальный остаток (шт) *</label>
+                            <input type="number" id="newProdStock" class="btn-secondary" style="width: 100%; padding: 0.65rem;" placeholder="25" min="0" required>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 0.85rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">Описание состава</label>
+                        <textarea id="newProdDescription" class="btn-secondary" style="width: 100%; padding: 0.65rem; height: 60px; resize: vertical;" placeholder="Фирменная булочка бриошь, две котлеты из сочной говядины, чеддер, соус BBQ, корнишоны..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; font-size: 0.82rem; margin-bottom: 0.3rem;">URL фото или пресет</label>
+                        <input type="text" id="newProdImageUrl" class="btn-secondary" style="width: 100%; padding: 0.65rem; margin-bottom: 0.5rem;" placeholder="/assets/images/product-2.jpg" value="/assets/images/product-2.jpg">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="document.getElementById('newProdImageUrl').value='/assets/images/product-2.jpg'">🍔 Бургер</button>
+                            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="document.getElementById('newProdImageUrl').value='/assets/images/pizza-peperoni.jpg'">🍕 Пицца</button>
+                            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="document.getElementById('newProdImageUrl').value='/assets/images/product-10.jpg'">🍣 Роллы</button>
+                            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="document.getElementById('newProdImageUrl').value='/assets/images/product-15.jpg'">🍫 Десерт</button>
+                            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="document.getElementById('newProdImageUrl').value='/assets/images/product-19.jpg'">🥤 Напиток</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                        <button type="button" class="btn-secondary" onclick="window.closeAddProductModal()">Отмена</button>
+                        <button type="submit" class="btn-primary" style="padding: 0.65rem 1.5rem;">Сохранить в меню</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DODO PIZZA STYLE CITY SELECTOR (ВСЕ ГОРОДА РОССИИ ЧЕРЕЗ DADATA) -->
+    <div id="citySelectModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 540px;">
+            <button class="modal-close-btn" onclick="window.closeCityModal()">✕</button>
+            <div style="padding: 1.75rem;">
+                <div style="text-align: center; margin-bottom: 1.25rem;">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.35rem;">📍</div>
+                    <h2 style="font-size: 1.4rem; font-weight: 800;">Выберите ваш город</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Поиск по всей России через DaData: доставим свежие блюда точно в срок</p>
+                </div>
+
+                <div style="position: relative; margin-bottom: 1.25rem;">
+                    <input type="text" id="citySearchInput" class="btn-secondary" style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.6rem; text-align: left; font-size: 0.95rem; border-radius: var(--radius-sm);" placeholder="Начните вводить любой город (Балашов, Самара, Москва)..." oninput="window.handleCitySearch(this.value)" autocomplete="off">
+                    <span style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); font-size: 1rem; color: var(--text-muted);">🔍</span>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">
+                        Популярные города
+                    </div>
+                    <div id="popularCitiesChips" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+                </div>
+
+                <div>
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">
+                        Результаты поиска (DaData)
+                    </div>
+                    <div id="citySearchResultsList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem;">
+                        <div style="padding: 1rem; text-align: center; color: var(--text-dim); font-size: 0.85rem;">
+                            Введите название города или выберите из популярных выше
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
